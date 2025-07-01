@@ -2,10 +2,12 @@ package com.ts.macher.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.util.UUID
+import java.util.UUID.randomUUID
 
 @Document("todos")
 data class Todos(
     @Id
-    val id: Int? = null,
+    val id: UUID = randomUUID(),
     val title: String,
 )
