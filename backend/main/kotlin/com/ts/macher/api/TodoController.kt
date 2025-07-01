@@ -1,10 +1,12 @@
 package com.ts.macher.api
 
-import com.ts.macher.model.todo.TodoService
-import com.ts.macher.model.todo.Todo
+import com.ts.macher.models.todo.TodoService
+import com.ts.macher.models.todo.Todo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Flux
@@ -20,7 +22,6 @@ class TodoController(
     @GetMapping
     fun findAll(): Flux<Todo> = todoService.findAll()
 
-/*    @PostMapping
-    fun createTodo(@RequestBody todo: Todo): Todo = todoRepository.save(todo)*/
-
+    @PostMapping
+    fun create(@RequestBody todo: Todo) = todoService.create(todo)
 }
