@@ -1,0 +1,14 @@
+---
+complexity:
+  LongParameterList:
+    excludes: ["**/test/**"]
+  LongMethod:
+    excludes: ["**/test/**"]
+
+naming:
+  ClassNaming:
+    excludes: ["**/test/**"]
+
+style:
+  MaxLineLength:
+    excludes: ["**/test/**"]
