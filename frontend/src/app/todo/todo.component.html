@@ -1,0 +1,14 @@
+<table class="table">
+  <thead class="thead-dark">
+  <tr>
+    <th scope="col">Todo</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    @for (todo of todos$(); track todo.id) {
+      <p>{{ todo.title }}</p>
+    }
+  </tr>
+  </tbody>
+</table>
