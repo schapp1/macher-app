@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {UserService} from './services/user';
 import {Todo} from './todo/todo';
 
 @Component({
@@ -15,12 +14,11 @@ export class App implements OnInit{
   message: string = ''
 
   constructor(
-    private userService: UserService
   ) {
 
   }
 
   ngOnInit() {
-    this.userService.getUsers().subscribe(data => this.message = data);
+
   }
 }
