@@ -1,6 +1,6 @@
 import {patchState, signalStore, withMethods} from '@ngrx/signals';
 import {setAllEntities, withEntities} from '@ngrx/signals/entities';
-import {Todo} from '../models/todo';
+import {Todo, TodoCreationRequest} from '../models/todo';
 import {TodoService} from '../service/todo.service';
 import {inject} from '@angular/core';
 import {rxMethod} from '@ngrx/signals/rxjs-interop';
@@ -16,8 +16,18 @@ export const TodoStore = signalStore(
     loadTodos: rxMethod<void>(
       pipe(
         switchMap(_ => todoService.fetchTodos()),
-        tap(todos =>  patchState(store, setAllEntities(todos))),
+        tap(todos => patchState(store, setAllEntities(todos))),
       )
     ),
+    addTodo: rxMethod<TodoCreationRequest>(
+      pipe(
+        switchMap(todo => todoService.addTodo(todo)),
+        tap(todo => {
+          if (todo) {
+            patchState(store, setAllEntities([todo]));
+          }
+        })
+      )
+    )
   }))
 )

@@ -17,8 +17,17 @@
             }
           </tbody>
         </table>
-
       </div>
+    </div>
+    <div class="col-3">
+      <form [formGroup]="todoForm" (ngSubmit)="addTodo()">
+        <div class="input-group">
+          <input type="text" class="form-control" formControlName="todo" aria-label="Text input with segmented dropdown button">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-outline-primary">add todo</button>
+          </div>
+        </div>
+      </form>
     </div>
   </div>
 </div>
