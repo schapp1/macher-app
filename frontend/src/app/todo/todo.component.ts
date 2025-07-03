@@ -19,6 +19,7 @@ export class TodoComponent implements OnInit{
   private readonly formBuilder = inject(FormBuilder);
   readonly todos$ = this.todoStore.entities;
   selectedTodoId: string | null = null;
+  selectedTodo: Todo | null = null;
 
   todoForm = this.formBuilder.group({
     todo: '',
@@ -33,6 +34,7 @@ export class TodoComponent implements OnInit{
   selectTodo(todo: Todo): void {
     console.log('Selected Todo:', todo);
     this.selectedTodoId = todo.id;
+    this.selectedTodo = todo;
   }
 
   addTodo(): void {
@@ -40,6 +42,14 @@ export class TodoComponent implements OnInit{
     if (todoValue) {
       this.todoStore.addTodo({title: todoValue});
       this.todoForm.reset();
+    }
+  }
+
+  deleteTodo(): void {
+    if (this.selectedTodo) {
+      this.todoStore.deleteTodo(this.selectedTodo);
+      this.selectedTodo = null;
+      this.selectedTodoId = null;
     }
   }
 }

@@ -1,5 +1,5 @@
 import {patchState, signalStore, withMethods} from '@ngrx/signals';
-import {setAllEntities, setEntity, withEntities} from '@ngrx/signals/entities';
+import {removeEntity, setAllEntities, setEntity, withEntities} from '@ngrx/signals/entities';
 import {Todo, TodoCreationRequest} from '../models/todo';
 import {TodoService} from '../service/todo.service';
 import {inject} from '@angular/core';
@@ -26,7 +26,15 @@ export const TodoStore = signalStore(
             patchState(store, setEntity(todo))
           })
         )
-      )
+      ),
+      deleteTodo: rxMethod<Todo>(
+        pipe(
+          switchMap(todo => todoService.deleteTodo(todo)),
+          tap(todo => {
+            patchState(store, removeEntity(todo.id))
+          })
+        )
+      ),
     }
   ))
 )
