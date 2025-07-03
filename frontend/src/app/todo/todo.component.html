@@ -1,14 +1,26 @@
-<table class="table">
-  <thead class="thead-dark">
-  <tr>
-    <th scope="col">Todo</th>
-  </tr>
-  </thead>
-  <tbody>
-    @for (todo of todos$(); track todo) {
-      <tr (click)="selectTodo(todo)" class="cursor-pointer">
-        <td>{{ todo.title }}</td>
-      </tr>
-    }
-  </tbody>
-</table>
+<div class="row mt-4 p-3">
+  <div class="col-6">
+    <div class="card">
+      <div class="card-body">
+        <table class="table">
+          <thead class="thead-dark">
+          <tr>
+            <th scope="col">Todo</th>
+          </tr>
+          </thead>
+          <tbody>
+            @for (todo of todos$(); track todo) {
+              <tr (click)="selectTodo(todo)" style="cursor: pointer"
+                  [ngClass]="{'table-active': todo.id === selectedTodoId}">
+                <td>{{ todo.title }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
