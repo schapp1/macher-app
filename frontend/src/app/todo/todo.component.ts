@@ -1,6 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {TodoStore} from '../state/todo.store';
-import {TodoCreationRequest} from '../models/todo';
+import {Todo} from '../models/todo';
 
 @Component({
   selector: 'app-todo',
@@ -8,7 +8,7 @@ import {TodoCreationRequest} from '../models/todo';
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
-export class Todo implements OnInit {
+export class TodoComponent implements OnInit {
 
   private readonly todoStore = inject(TodoStore);
   todos$ = this.todoStore.entities;
@@ -20,7 +20,7 @@ export class Todo implements OnInit {
     this.todoStore.loadTodos();
   }
 
-  selectTodo(todo: TodoCreationRequest): void {
+  selectTodo(todo: Todo): void {
     console.log('Selected Todo:', todo);
   }
 }

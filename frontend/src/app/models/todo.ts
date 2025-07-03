@@ -4,5 +4,3 @@ export interface Todo {
 }
 
 export interface TodoCreationRequest { title: string }
-
-export interface TodoCollection { todos: Todo[] }

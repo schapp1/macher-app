@@ -1,10 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {Todo} from './todo/todo.component';
+import {TodoComponent} from './todo/todo.component';
 
 @Component({
   selector: 'app-root',
   imports: [
-    Todo,
+    TodoComponent,
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
