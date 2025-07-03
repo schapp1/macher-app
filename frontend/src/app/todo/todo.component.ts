@@ -13,12 +13,13 @@ import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
   templateUrl: './todo.component.html',
   styleUrl: './todo.component.scss'
 })
-export class TodoComponent implements OnInit {
+export class TodoComponent implements OnInit{
 
   private readonly todoStore = inject(TodoStore);
   private readonly formBuilder = inject(FormBuilder);
-  todos$ = this.todoStore.entities;
+  readonly todos$ = this.todoStore.entities;
   selectedTodoId: string | null = null;
+
   todoForm = this.formBuilder.group({
     todo: '',
   })
