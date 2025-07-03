@@ -1,5 +1,6 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {TodoStore} from '../state/todo.store';
+import {TodoCreationRequest} from '../models/todo';
 
 @Component({
   selector: 'app-todo',
@@ -17,5 +18,9 @@ export class Todo implements OnInit {
 
   ngOnInit() {
     this.todoStore.loadTodos();
+  }
+
+  selectTodo(todo: TodoCreationRequest): void {
+    console.log('Selected Todo:', todo);
   }
 }
