@@ -27,4 +27,10 @@ export class TodoService {
       map(() => todo)
     )
   }
+
+  uploadExcel(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.API}/upload-excel`, formData);
+  }
 }

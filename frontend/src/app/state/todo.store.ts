@@ -35,6 +35,11 @@ export const TodoStore = signalStore(
           })
         )
       ),
+      uploadExcel: rxMethod<File>(
+        pipe(
+          switchMap(file => todoService.uploadExcel(file)),
+        )
+      )
     }
   ))
 )

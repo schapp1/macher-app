@@ -52,4 +52,14 @@ export class TodoComponent implements OnInit{
       this.selectedTodoId = null;
     }
   }
+
+  uploadExcel(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+    if (files && files.length > 0) {
+      this.todoStore.uploadExcel(files[0]);
+      // Datei-Input zurücksetzen
+      target.value = '';
+    }
+  }
 }

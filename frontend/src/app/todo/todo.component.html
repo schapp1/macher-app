@@ -34,3 +34,15 @@
     </div>
   </div>
 </div>
+<div class="row">
+  <div class="col-4">
+    <div class="mb-3">
+      <label for="formFile" class="form-label">Excel-Datei hochladen</label>
+      <input class="form-control" type="file" id="formFile"
+             accept=".xlsx,.xls" (change)="uploadExcel($event)" #fileInput>
+      <button class="btn btn-primary mt-2" (click)="fileInput.click()">
+        Excel hochladen
+      </button>
+    </div>
+  </div>
+</div>
