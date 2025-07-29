@@ -13,25 +13,25 @@ export const PartStore = signalStore(
     store,
     partService = inject(PartService),
   ) => ({
-      loadTodos: rxMethod<void>(
+      loadParts: rxMethod<void>(
         pipe(
           switchMap(_ => partService.fetchParts()),
           tap(parts => patchState(store, setAllEntities(parts))),
         )
       ),
-      addTodo: rxMethod<PartCreationRequest>(
+      addPart: rxMethod<PartCreationRequest>(
         pipe(
           switchMap(part => partService.addPart(part)),
-          tap(todo => {
-            patchState(store, setEntity(todo))
+          tap(part => {
+            patchState(store, setEntity(part))
           })
         )
       ),
-      deleteTodo: rxMethod<Part>(
+      deletePart: rxMethod<Part>(
         pipe(
           switchMap(todo => partService.deletePart(todo)),
-          tap(todo => {
-            patchState(store, removeEntity(todo.id))
+          tap(part => {
+            patchState(store, removeEntity(part.id))
           })
         )
       ),
@@ -57,18 +57,10 @@ export const PartStore = signalStore(
             catchError(error => {
               console.error('Fehler beim Excel-Upload:', error);
               return EMPTY;
-            })
+            }),
           )),
-          // Nach erfolgreichem Upload die Parts neu laden
-          switchMap(() => partService.fetchParts()),
-          tap({
-            next: (parts) => patchState(store, setAllEntities<Part>(parts)),
-            error: (error) => {
-              console.error('Fehler beim Laden der Parts nach Upload:', error);
-            }
-          })
         )
-      ),
+      )
     }
   ))
 )

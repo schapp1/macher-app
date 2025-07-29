@@ -19,22 +19,26 @@
         </table>
       </div>
     </div>
-    <div class="col-3">
-      <form [formGroup]="todoForm" (ngSubmit)="addPart()">
-        <div class="input-group">
-          <input type="text" class="form-control" formControlName="todo" aria-label="Text input with segmented dropdown button">
-          <div class="input-group-append">
-            <button type="submit" class="btn btn-outline-primary">add todo</button>
-          </div>
+  </div>
+</div>
+
+<div class="container">
+<div class="row">
+  <div class="col-6">
+    <div class="btn-group" role="group" aria-label="Basic example">
+      <button type="button" class="btn btn-warning" (click)="deletePart()" [disabled]="!selectedPart">delete</button>
+      <button type="button" class="btn btn-danger" (click)="deleteAllParts()">delete all</button>
+    </div>
+  </div>
+  <div class="col-4">
+    <form [formGroup]="todoForm" (ngSubmit)="addPart()">
+      <div class="input-group">
+        <input type="text" class="form-control" formControlName="todo" aria-label="Text input with segmented dropdown button">
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-outline-primary">add part</button>
         </div>
-      </form>
-    </div>
-    <div class="col-1">
-      <button class="btn btn-outline-primary" (click)="deletePart()" [disabled]="!selectedPart">delete</button>
-    </div>
-    <div class="col-1">
-      <button class="btn btn-outline-primary" (click)="deleteAllParts()">delete all</button>
-    </div>
+      </div>
+    </form>
   </div>
 </div>
 <div class="row">
@@ -43,9 +47,7 @@
       <label for="formFile" class="form-label">Excel-Datei hochladen</label>
       <input class="form-control" type="file" id="formFile"
              accept=".xlsx,.xls" (change)="uploadExcel($event)" #fileInput>
-      <button class="btn btn-primary mt-2" (click)="fileInput.click()">
-        Excel hochladen
-      </button>
     </div>
   </div>
+</div>
 </div>

@@ -28,7 +28,7 @@ export class PartComponent implements OnInit{
   constructor() {}
 
   ngOnInit() {
-    this.partStore.loadTodos();
+    this.partStore.loadParts();
   }
 
   selectPart(part: Part): void {
@@ -40,14 +40,14 @@ export class PartComponent implements OnInit{
   addPart(): void {
     const todoValue = this.todoForm.get('todo')?.value;
     if (todoValue) {
-      this.partStore.addTodo({title: todoValue});
+      this.partStore.addPart({title: todoValue});
       this.todoForm.reset();
     }
   }
 
   deletePart(): void {
     if (this.selectedPart) {
-      this.partStore.deleteTodo(this.selectedPart);
+      this.partStore.deletePart(this.selectedPart);
       this.selectedPart = null;
       this.selectedPartId = null;
     }
@@ -61,7 +61,7 @@ export class PartComponent implements OnInit{
       // Datei-Input zurücksetzen
       target.value = '';
     }
-    this.partStore.loadTodos();
+    this.partStore.loadParts();
   }
 
   deleteAllParts(): void {
