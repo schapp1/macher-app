@@ -1,35 +1,35 @@
 import {patchState, signalStore, withMethods} from '@ngrx/signals';
 import {removeEntity, setAllEntities, setEntity, withEntities} from '@ngrx/signals/entities';
-import {Todo, TodoCreationRequest} from '../models/todo';
-import {TodoService} from '../service/todo.service';
+import {Part, PartCreationRequest} from '../models/part';
+import {PartService} from '../service/part.service';
 import {inject} from '@angular/core';
 import {rxMethod} from '@ngrx/signals/rxjs-interop';
 import {pipe, switchMap, tap} from 'rxjs';
 
-export const TodoStore = signalStore(
+export const PartStore = signalStore(
   {providedIn: 'root',},
-  withEntities<Todo>(),
+  withEntities<Part>(),
   withMethods((
     store,
-    todoService = inject(TodoService),
+    partService = inject(PartService),
   ) => ({
       loadTodos: rxMethod<void>(
         pipe(
-          switchMap(_ => todoService.fetchTodos()),
-          tap(todos => patchState(store, setAllEntities(todos))),
+          switchMap(_ => partService.fetchParts()),
+          tap(parts => patchState(store, setAllEntities(parts))),
         )
       ),
-      addTodo: rxMethod<TodoCreationRequest>(
+      addTodo: rxMethod<PartCreationRequest>(
         pipe(
-          switchMap(todo => todoService.addTodo(todo)),
+          switchMap(part => partService.addPart(part)),
           tap(todo => {
             patchState(store, setEntity(todo))
           })
         )
       ),
-      deleteTodo: rxMethod<Todo>(
+      deleteTodo: rxMethod<Part>(
         pipe(
-          switchMap(todo => todoService.deleteTodo(todo)),
+          switchMap(todo => partService.deletePart(todo)),
           tap(todo => {
             patchState(store, removeEntity(todo.id))
           })
@@ -37,7 +37,7 @@ export const TodoStore = signalStore(
       ),
       uploadExcel: rxMethod<File>(
         pipe(
-          switchMap(file => todoService.uploadExcel(file)),
+          switchMap(file => partService.uploadExcel(file)),
         )
       )
     }

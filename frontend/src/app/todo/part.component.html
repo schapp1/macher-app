@@ -5,13 +5,13 @@
         <table class="table">
           <thead class="thead-dark">
           <tr>
-            <th scope="col">Todo</th>
+            <th scope="col">part number</th>
           </tr>
           </thead>
           <tbody>
-            @for (todo of todos$(); track todo) {
-              <tr (click)="selectTodo(todo)" style="cursor: pointer"
-                  [ngClass]="{'table-active': todo.id === selectedTodoId}">
+            @for (todo of parts$(); track todo) {
+              <tr (click)="selectPart(todo)" style="cursor: pointer"
+                  [ngClass]="{'table-active': todo.id === selectedPartId}">
                 <td>{{ todo.title }}</td>
               </tr>
             }
@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="col-3">
-      <form [formGroup]="todoForm" (ngSubmit)="addTodo()">
+      <form [formGroup]="todoForm" (ngSubmit)="addPart()">
         <div class="input-group">
           <input type="text" class="form-control" formControlName="todo" aria-label="Text input with segmented dropdown button">
           <div class="input-group-append">
@@ -30,7 +30,7 @@
       </form>
     </div>
     <div class="col-1">
-      <button class="btn btn-outline-primary" (click)="deleteTodo()" [disabled]="!selectedTodo">delete</button>
+      <button class="btn btn-outline-primary" (click)="deletePart()" [disabled]="!selectedPart">delete</button>
     </div>
   </div>
 </div>

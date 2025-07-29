@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 @RestController
-@RequestMapping("/api/todos")
+@RequestMapping("/api/parts")
 @CrossOrigin(origins = ["http://localhost:4200"])
 class TodoController(
     @Autowired
