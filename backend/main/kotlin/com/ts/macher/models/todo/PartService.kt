@@ -9,15 +9,17 @@ import reactor.core.scheduler.Schedulers
 import java.util.UUID
 
 @Service
-class TodoService(
-    private val todoRepository: TodoRepository,
+class PartService(
+    private val partRepository: PartRepository,
 ) {
 
-    fun findAll(): Flux<Todo> = todoRepository.findAll()
+    fun findAll(): Flux<Part> = partRepository.findAll()
 
-    fun create(todo: Todo): Mono<Todo> = todoRepository.save(todo)
+    fun create(part: Part): Mono<Part> = partRepository.save(part)
 
-    fun deleteById(id: UUID): Mono<Void> = todoRepository.deleteById(id)
+    fun deleteById(id: UUID): Mono<Void> = partRepository.deleteById(id)
+
+    fun deleteAll(): Mono<Void> = partRepository.deleteAll()
 
     fun processExcelFile(file: MultipartFile): Mono<Void> {
         return Mono.fromCallable {
@@ -30,7 +32,7 @@ class TodoService(
                 .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "todo" }
                 ?: throw IllegalArgumentException("Keine 'todo'-Spalte in der Excel-Datei gefunden")
 
-            val todos = mutableListOf<Todo>()
+            val parts = mutableListOf<Part>()
 
             // Ab Zeile 1 (nach der Überschriftenzeile) alle Zeilen durchlaufen
             for (i in 1 until sheet.physicalNumberOfRows) {
@@ -38,7 +40,7 @@ class TodoService(
                 val todoText = row.getCell(todoColumnIndex)?.toString()?.trim() ?: continue
 
                 if (todoText.isNotBlank()) {
-                    todos.add(Todo(
+                    parts.add(Part(
                         id = UUID.randomUUID(),
                         title = todoText
                     ))
@@ -46,11 +48,11 @@ class TodoService(
             }
 
             workbook.close()
-            todos
+            parts
         }
             .subscribeOn(Schedulers.boundedElastic())
             .flatMapMany { todoList ->
-                todoRepository.saveAll(todoList)
+                partRepository.saveAll(todoList)
             }
             .then()
     }

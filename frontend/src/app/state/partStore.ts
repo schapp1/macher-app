@@ -4,7 +4,7 @@ import {Part, PartCreationRequest} from '../models/part';
 import {PartService} from '../service/part.service';
 import {inject} from '@angular/core';
 import {rxMethod} from '@ngrx/signals/rxjs-interop';
-import {pipe, switchMap, tap} from 'rxjs';
+import {catchError, EMPTY, pipe, switchMap, tap} from 'rxjs';
 
 export const PartStore = signalStore(
   {providedIn: 'root',},
@@ -35,11 +35,40 @@ export const PartStore = signalStore(
           })
         )
       ),
+      deleteAllParts: rxMethod<void>(
+        pipe(
+          switchMap(_ => partService.deleteAllParts().pipe(
+            catchError(error => {
+              console.error('Fehler beim Löschen aller Teile:', error);
+              return EMPTY;
+            })
+          )),
+          tap({
+            next: () => patchState(store, setAllEntities<Part>([])),
+            error: (error) => {
+              console.error('Fehler beim Aktualisieren des Stores:', error);
+            }
+          })
+        )
+      ),
       uploadExcel: rxMethod<File>(
         pipe(
-          switchMap(file => partService.uploadExcel(file)),
+          switchMap(file => partService.uploadExcel(file).pipe(
+            catchError(error => {
+              console.error('Fehler beim Excel-Upload:', error);
+              return EMPTY;
+            })
+          )),
+          // Nach erfolgreichem Upload die Parts neu laden
+          switchMap(() => partService.fetchParts()),
+          tap({
+            next: (parts) => patchState(store, setAllEntities<Part>(parts)),
+            error: (error) => {
+              console.error('Fehler beim Laden der Parts nach Upload:', error);
+            }
+          })
         )
-      )
+      ),
     }
   ))
 )

@@ -61,5 +61,10 @@ export class PartComponent implements OnInit{
       // Datei-Input zurücksetzen
       target.value = '';
     }
+    this.partStore.loadTodos();
+  }
+
+  deleteAllParts(): void {
+    this.partStore.deleteAllParts()
   }
 }

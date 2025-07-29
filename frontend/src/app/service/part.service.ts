@@ -28,6 +28,10 @@ export class PartService {
     )
   }
 
+  deleteAllParts(): Observable<void> {
+    return this.http.delete<void>(this.API);
+  }
+
   uploadExcel(file: File): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);

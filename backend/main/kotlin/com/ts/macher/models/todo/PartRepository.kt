@@ -5,4 +5,4 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface TodoRepository : ReactiveMongoRepository<Todo, UUID>
+interface PartRepository : ReactiveMongoRepository<Part, UUID>
