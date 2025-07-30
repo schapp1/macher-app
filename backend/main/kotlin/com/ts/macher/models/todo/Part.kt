@@ -12,4 +12,6 @@ data class Part(
     val idlNumber: String,
     val partNumber: String,
     val level: String,
+    val isAssy: Boolean = false,
+    val children: List<Part> = emptyList()
 )

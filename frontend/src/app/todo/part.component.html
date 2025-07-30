@@ -8,15 +8,20 @@
             <th scope="col">idl number</th>
             <th scope="col">part number</th>
             <th scope="col">level</th>
+            <th scope="col">assey</th>
+            <th scope="col">children</th>
+
           </tr>
           </thead>
           <tbody>
-            @for (level of parts$(); track level) {
-              <tr (click)="selectPart(level)" style="cursor: pointer"
-                  [ngClass]="{'table-active': level.id === selectedPartId}">
-                <td>{{ level.idlNumber }}</td>
-                <td>{{ level.partNumber }}</td>
-                <td>{{ level.level }}</td>
+            @for (part of parts$(); track part) {
+              <tr (click)="selectPart(part)" style="cursor: pointer"
+                  [ngClass]="{'table-active': part.id === selectedPartId}">
+                <td>{{ part.idlNumber }}</td>
+                <td>{{ part.partNumber }}</td>
+                <td>{{ part.level }}</td>
+                <td>{{ part.isAssey }}</td>
+                <td>{{ part.children }}</td>
               </tr>
             }
           </tbody>

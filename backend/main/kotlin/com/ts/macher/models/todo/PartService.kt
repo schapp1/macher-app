@@ -27,7 +27,6 @@ class PartService(
             val sheet = workbook.getSheetAt(0)
             val headerRow = sheet.getRow(0)
 
-            // Finde die Indizes der relevanten Spalten
             val idlColumnIndex = (0 until headerRow.physicalNumberOfCells)
                 .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "idl-nummer" }
                 ?: throw IllegalArgumentException("Keine 'IDL-Nummer'-Spalte in der Excel-Datei gefunden")
@@ -38,30 +37,71 @@ class PartService(
                 .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "auflösungsstufe" }
                 ?: throw IllegalArgumentException("Keine 'Auflösungsstufe'-Spalte in der Excel-Datei gefunden")
 
-            val parts = mutableListOf<Part>()
+            data class RowPart(
+                val index: Int,
+                val part: Part,
+                val level: Int,
+                var children: MutableList<RowPart> = mutableListOf()
+            )
 
-            // Ab Zeile 1 (nach der Überschriftenzeile) alle Zeilen durchlaufen
+            val allParts = mutableListOf<RowPart>()
+            var currentAssembly: RowPart? = null
+            var currentSubAssembly: RowPart? = null
+
             for (i in 1 until sheet.physicalNumberOfRows) {
                 val row = sheet.getRow(i) ?: continue
-                val idlNumber = row.getCell(idlColumnIndex)?.toString()?.trim() ?: continue
-                val partNumber = row.getCell(partNumberColumnIndex)?.toString()?.trim() ?: continue
-                val level = row.getCell(aufloesungsstufeColumnIndex)
-                    ?.toString()
-                    ?.trim()
-                    ?.replace(Regex("\\D"), "") // entfernt alles außer Ziffern
-                    ?: continue
-                if (idlNumber.isNotBlank() && partNumber.isNotBlank() && level.isNotBlank()) {
-                    parts.add(Part(
-                        id = UUID.randomUUID(),
-                        idlNumber = idlNumber,
-                        partNumber = partNumber,
-                        level = level,
-                    ))
+                val idlNumber = row.getCell(idlColumnIndex)?.toString()?.trim() ?: ""
+                val partNumber = row.getCell(partNumberColumnIndex)?.toString()?.trim() ?: ""
+                val levelStr = row.getCell(aufloesungsstufeColumnIndex)?.toString()?.trim() ?: ""
+                val level = levelStr.replace(Regex("[^0-9]"), "").toIntOrNull() ?: continue
+
+                if (idlNumber.isNotBlank() || partNumber.isNotBlank()) {
+                    val rowPart = RowPart(
+                        index = i,
+                        part = Part(
+                            id = UUID.randomUUID(),
+                            idlNumber = idlNumber,
+                            partNumber = partNumber,
+                            level = level.toString(), // Speichere nur die Zahl
+                            isAssy = false // wird später basierend auf Children gesetzt
+                        ),
+                        level = level
+                    )
+
+                    when {
+                        level == 4 -> {
+                            currentAssembly = rowPart
+                            currentSubAssembly = null
+                            allParts.add(rowPart)
+                        }
+                        level == 5 && currentAssembly != null -> {
+                            currentSubAssembly = rowPart
+                            currentAssembly.children.add(rowPart)
+                        }
+                        level > 5 && currentSubAssembly != null -> {
+                            currentSubAssembly.children.add(rowPart)
+                        }
+                        level == 3 -> {
+                            // Single Parts mit Level 3 direkt zu allParts hinzufügen
+                            allParts.add(rowPart)
+                        }
+                    }
                 }
             }
 
+            // Konvertiere die Hierarchie in Part-Objekte und setze isAssy
+            fun convertToPart(rowPart: RowPart): Part {
+                val children = rowPart.children.map { convertToPart(it) }
+                return rowPart.part.copy(
+                    children = children,
+                    isAssy = children.isNotEmpty() // Ein Teil ist ein Assembly, wenn es Children hat
+                )
+            }
+
+            val rootParts = allParts.map { convertToPart(it) }
+
             workbook.close()
-            parts
+            rootParts
         }
             .subscribeOn(Schedulers.boundedElastic())
             .flatMapMany { partList ->
