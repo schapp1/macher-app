@@ -1,42 +1,47 @@
-<div class="row mt-4 p-3">
-  <div class="col-8">
-    <div class="card">
-      <div class="card-body">
-        <table class="table">
-          <thead class="thead-dark">
-          <tr>
-            <th scope="col">idl number</th>
-            <th scope="col">part number</th>
-            <th scope="col">level</th>
-            <th scope="col">assey</th>
-            <th scope="col">children</th>
 
-          </tr>
-          </thead>
-          <tbody>
-            @for (part of parts$(); track part) {
-              <tr (click)="selectPart(part)" style="cursor: pointer"
-                  [ngClass]="{'table-active': part.id === selectedPartId}">
-                <td>{{ part.idlNumber }}</td>
-                <td>{{ part.partNumber }}</td>
-                <td>{{ part.level }}</td>
-                <td>{{ part.isAssey }}</td>
-                <td>{{ part.children }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-  <div class="col-4">
-    <div class="card">
-      <div class="card-body">
-        <h4>additional part infos</h4>
-      </div>
-    </div>
-  </div>
-</div>
+<table class="table">
+  <thead class="thead-dark">
+  <tr>
+    <th scope="col">IDL Nummer</th>
+    <th scope="col">Teilenummer</th>
+    <th scope="col">Level</th>
+    <th scope="col">Baugruppe</th>
+  </tr>
+  </thead>
+  <tbody>
+    @for (part of parts$(); track part) {
+      <ng-container *ngTemplateOutlet="recursiveTable; context: { $implicit: part, level: 0 }">
+      </ng-container>
+    }
+  </tbody>
+</table>
+
+<ng-template #recursiveTable let-part let-level="level">
+  <tr (click)="selectPart(part)"
+      style="cursor: pointer"
+      [ngClass]="{'table-active': part.id === selectedPartId}">
+    <td [style.padding-left.px]="level * 20">
+      <i *ngIf="part.children?.length"
+         class="bi"
+         [class.bi-caret-down-fill]="isExpanded(part.id)"
+         [class.bi-caret-right-fill]="!isExpanded(part.id)"
+         (click)="toggleExpand(part.id, $event)">
+      </i>
+      {{ part.idlNumber }}
+    </td>
+    <td>{{ part.partNumber }}</td>
+    <td>{{ part.level }}</td>
+    <td>
+      <i *ngIf="part.isAssey" class="bi bi-box-seam text-primary"></i>
+    </td>
+  </tr>
+  @if (part.children?.length && isExpanded(part.id)) {
+    @for (child of part.children; track child) {
+      <ng-container *ngTemplateOutlet="recursiveTable; context: { $implicit: child, level: level + 1 }">
+      </ng-container>
+    }
+  }
+</ng-template>
 
 <div class="container">
 <div class="row">

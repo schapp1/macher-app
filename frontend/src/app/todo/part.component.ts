@@ -1,14 +1,17 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {PartStore} from '../state/partStore';
 import {Part} from '../models/part';
-import {NgClass} from '@angular/common';
+import {NgClass, NgIf, NgTemplateOutlet} from '@angular/common';
 import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-todo',
   imports: [
     NgClass,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgTemplateOutlet,
+    NgIf
+
   ],
   templateUrl: './part.component.html',
   styleUrl: './part.component.scss'
@@ -20,8 +23,11 @@ export class PartComponent implements OnInit{
   readonly parts$ = this.partStore.entities;
   selectedPartId: string | null = null;
   selectedPart: Part | null = null;
+  expandedPartIds = new Set<string>();
 
-  partForm = this.formBuilder.group({
+
+
+partForm = this.formBuilder.group({
     part: '',
   })
 
@@ -35,6 +41,19 @@ export class PartComponent implements OnInit{
     console.log('Selected Part:', part);
     this.selectedPartId = part.id;
     this.selectedPart = part;
+  }
+
+  isExpanded(partId: string): boolean {
+    return this.expandedPartIds.has(partId);
+  }
+
+  toggleExpand(partId: string, event: Event): void {
+    event.stopPropagation(); // Verhindert, dass die Zeile selektiert wird
+    if (this.expandedPartIds.has(partId)) {
+      this.expandedPartIds.delete(partId);
+    } else {
+      this.expandedPartIds.add(partId);
+    }
   }
 
   addPart(): void {
