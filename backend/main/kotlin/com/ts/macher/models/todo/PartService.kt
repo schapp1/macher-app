@@ -21,6 +21,7 @@ class PartService(
 
     fun deleteAll(): Mono<Void> = partRepository.deleteAll()
 
+
     fun processExcelFile(file: MultipartFile): Mono<Void> {
         return Mono.fromCallable {
             val workbook = XSSFWorkbook(file.inputStream)
@@ -55,15 +56,18 @@ class PartService(
                 val levelStr = row.getCell(aufloesungsstufeColumnIndex)?.toString()?.trim() ?: ""
                 val level = levelStr.replace(Regex("[^0-9]"), "").toIntOrNull() ?: continue
 
-                if (idlNumber.isNotBlank() || partNumber.isNotBlank()) {
+                // Erstelle nur ein RowPart, wenn die Bedingungen erfüllt sind
+                if ((level != 3 && (idlNumber.isNotBlank() || partNumber.isNotBlank())) ||
+                    (level == 3 && partNumber.isNotBlank())) {
+
                     val rowPart = RowPart(
                         index = i,
                         part = Part(
                             id = UUID.randomUUID(),
                             idlNumber = idlNumber,
                             partNumber = partNumber,
-                            level = level.toString(), // Speichere nur die Zahl
-                            isAssy = false // wird später basierend auf Children gesetzt
+                            level = level.toString(),
+                            isAssy = false
                         ),
                         level = level
                     )
@@ -82,7 +86,7 @@ class PartService(
                             currentSubAssembly.children.add(rowPart)
                         }
                         level == 3 -> {
-                            // Single Parts mit Level 3 direkt zu allParts hinzufügen
+                            // Nur Level-3-Parts mit nicht-leerer Partnummer werden gespeichert
                             allParts.add(rowPart)
                         }
                     }
@@ -94,7 +98,7 @@ class PartService(
                 val children = rowPart.children.map { convertToPart(it) }
                 return rowPart.part.copy(
                     children = children,
-                    isAssy = children.isNotEmpty() // Ein Teil ist ein Assembly, wenn es Children hat
+                    isAssy = children.isNotEmpty()
                 )
             }
 
