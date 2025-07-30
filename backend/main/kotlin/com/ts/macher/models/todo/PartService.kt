@@ -45,8 +45,11 @@ class PartService(
                 val row = sheet.getRow(i) ?: continue
                 val idlNumber = row.getCell(idlColumnIndex)?.toString()?.trim() ?: continue
                 val partNumber = row.getCell(partNumberColumnIndex)?.toString()?.trim() ?: continue
-                val level = row.getCell(aufloesungsstufeColumnIndex)?.toString()?.trim() ?: continue
-
+                val level = row.getCell(aufloesungsstufeColumnIndex)
+                    ?.toString()
+                    ?.trim()
+                    ?.replace(Regex("\\D"), "") // entfernt alles außer Ziffern
+                    ?: continue
                 if (idlNumber.isNotBlank() && partNumber.isNotBlank() && level.isNotBlank()) {
                     parts.add(Part(
                         id = UUID.randomUUID(),
