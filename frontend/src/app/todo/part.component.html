@@ -4,8 +4,8 @@
   <tr>
     <th scope="col">IDL Nummer</th>
     <th scope="col">Teilenummer</th>
+    <th scope="col">Materialkurztext</th>
     <th scope="col">Level</th>
-    <th scope="col">Baugruppe</th>
   </tr>
   </thead>
   <tbody>
@@ -30,6 +30,7 @@
       {{ part.idlNumber }}
     </td>
     <td>{{ part.partNumber }}</td>
+    <td>{{ part.matShortText }}</td>
     <td>{{ part.level }}</td>
     <td>
       <i *ngIf="part.isAssey" class="bi bi-box-seam text-primary"></i>

@@ -37,6 +37,9 @@ class PartService(
             val aufloesungsstufeColumnIndex = (0 until headerRow.physicalNumberOfCells)
                 .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "auflösungsstufe" }
                 ?: throw IllegalArgumentException("Keine 'Auflösungsstufe'-Spalte in der Excel-Datei gefunden")
+            val matShortTextColumnIndex = (0 until headerRow.physicalNumberOfCells)
+                .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "materialkurztext" }
+                ?: throw IllegalArgumentException("Keine 'Materialkurztext'-Spalte in der Excel-Datei gefunden")
 
             data class RowPart(
                 val index: Int,
@@ -55,6 +58,7 @@ class PartService(
                 val partNumber = row.getCell(partNumberColumnIndex)?.toString()?.trim() ?: ""
                 val levelStr = row.getCell(aufloesungsstufeColumnIndex)?.toString()?.trim() ?: ""
                 val level = levelStr.replace(Regex("[^0-9]"), "").toIntOrNull() ?: continue
+                val matShortText = row.getCell(matShortTextColumnIndex)?.toString()?.trim() ?: ""
 
                 // Erstelle nur ein RowPart, wenn die Bedingungen erfüllt sind
                 if ((level != 3 && (idlNumber.isNotBlank() || partNumber.isNotBlank())) ||
@@ -67,7 +71,8 @@ class PartService(
                             idlNumber = idlNumber,
                             partNumber = partNumber,
                             level = level.toString(),
-                            isAssy = false
+                            isAssy = false,
+                            matShortText = matShortText,
                         ),
                         level = level
                     )

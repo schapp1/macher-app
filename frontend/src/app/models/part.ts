@@ -4,6 +4,7 @@ export interface Part {
   partNumber: string;
   level: string;
   children: Part[];
+  matShortText: string;
   isAssey: boolean;
 }
 

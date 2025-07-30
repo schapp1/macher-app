@@ -13,5 +13,6 @@ data class Part(
     val partNumber: String,
     val level: String,
     val isAssy: Boolean = false,
-    val children: List<Part> = emptyList()
+    val children: List<Part> = emptyList(),
+    val matShortText: String?,
 )
