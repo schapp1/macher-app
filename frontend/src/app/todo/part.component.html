@@ -5,14 +5,18 @@
         <table class="table">
           <thead class="thead-dark">
           <tr>
+            <th scope="col">idl number</th>
             <th scope="col">part number</th>
+            <th scope="col">level</th>
           </tr>
           </thead>
           <tbody>
-            @for (todo of parts$(); track todo) {
-              <tr (click)="selectPart(todo)" style="cursor: pointer"
-                  [ngClass]="{'table-active': todo.id === selectedPartId}">
-                <td>{{ todo.title }}</td>
+            @for (level of parts$(); track level) {
+              <tr (click)="selectPart(level)" style="cursor: pointer"
+                  [ngClass]="{'table-active': level.id === selectedPartId}">
+                <td>{{ level.idlNumber }}</td>
+                <td>{{ level.partNumber }}</td>
+                <td>{{ level.level }}</td>
               </tr>
             }
           </tbody>
@@ -38,9 +42,9 @@
     </div>
   </div>
   <div class="col-4">
-    <form [formGroup]="todoForm" (ngSubmit)="addPart()">
+    <form [formGroup]="partForm" (ngSubmit)="addPart()">
       <div class="input-group">
-        <input type="text" class="form-control" formControlName="todo" aria-label="Text input with segmented dropdown button">
+        <input type="text" class="form-control" formControlName="part" aria-label="Text input with segmented dropdown button">
         <div class="input-group-append">
           <button type="submit" class="btn btn-outline-primary">add part</button>
         </div>

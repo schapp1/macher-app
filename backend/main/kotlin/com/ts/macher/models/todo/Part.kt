@@ -9,5 +9,7 @@ import java.util.UUID.randomUUID
 data class Part(
     @Id
     val id: UUID = randomUUID(),
-    val title: String,
+    val idlNumber: String,
+    val partNumber: String,
+    val level: String,
 )

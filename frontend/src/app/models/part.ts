@@ -1,6 +1,8 @@
 export interface Part {
   id: string;
-  title: string;
+  idlNumber: string;
+  partNumber: string;
+  level: string;
 }
 
-export interface PartCreationRequest { title: string }
+export interface PartCreationRequest { partNumber: string }

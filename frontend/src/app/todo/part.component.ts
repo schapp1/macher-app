@@ -21,8 +21,8 @@ export class PartComponent implements OnInit{
   selectedPartId: string | null = null;
   selectedPart: Part | null = null;
 
-  todoForm = this.formBuilder.group({
-    todo: '',
+  partForm = this.formBuilder.group({
+    part: '',
   })
 
   constructor() {}
@@ -38,10 +38,10 @@ export class PartComponent implements OnInit{
   }
 
   addPart(): void {
-    const todoValue = this.todoForm.get('todo')?.value;
-    if (todoValue) {
-      this.partStore.addPart({title: todoValue});
-      this.todoForm.reset();
+    const partNumber= this.partForm.get('part')?.value;
+    if (partNumber) {
+      this.partStore.addPart({partNumber: partNumber});
+      this.partForm.reset();
     }
   }
 

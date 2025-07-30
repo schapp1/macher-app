@@ -27,22 +27,32 @@ class PartService(
             val sheet = workbook.getSheetAt(0)
             val headerRow = sheet.getRow(0)
 
-            // Finde den Index der "todo"-Spalte
-            val todoColumnIndex = (0 until headerRow.physicalNumberOfCells)
-                .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "todo" }
-                ?: throw IllegalArgumentException("Keine 'todo'-Spalte in der Excel-Datei gefunden")
+            // Finde die Indizes der relevanten Spalten
+            val idlColumnIndex = (0 until headerRow.physicalNumberOfCells)
+                .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "idl-nummer" }
+                ?: throw IllegalArgumentException("Keine 'IDL-Nummer'-Spalte in der Excel-Datei gefunden")
+            val partNumberColumnIndex = (0 until headerRow.physicalNumberOfCells)
+                .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "partnummer" }
+                ?: throw IllegalArgumentException("Keine 'Partnummer'-Spalte in der Excel-Datei gefunden")
+            val aufloesungsstufeColumnIndex = (0 until headerRow.physicalNumberOfCells)
+                .find { headerRow.getCell(it)?.stringCellValue?.lowercase() == "auflösungsstufe" }
+                ?: throw IllegalArgumentException("Keine 'Auflösungsstufe'-Spalte in der Excel-Datei gefunden")
 
             val parts = mutableListOf<Part>()
 
             // Ab Zeile 1 (nach der Überschriftenzeile) alle Zeilen durchlaufen
             for (i in 1 until sheet.physicalNumberOfRows) {
                 val row = sheet.getRow(i) ?: continue
-                val todoText = row.getCell(todoColumnIndex)?.toString()?.trim() ?: continue
+                val idlNumber = row.getCell(idlColumnIndex)?.toString()?.trim() ?: continue
+                val partNumber = row.getCell(partNumberColumnIndex)?.toString()?.trim() ?: continue
+                val level = row.getCell(aufloesungsstufeColumnIndex)?.toString()?.trim() ?: continue
 
-                if (todoText.isNotBlank()) {
+                if (idlNumber.isNotBlank() && partNumber.isNotBlank() && level.isNotBlank()) {
                     parts.add(Part(
                         id = UUID.randomUUID(),
-                        title = todoText
+                        idlNumber = idlNumber,
+                        partNumber = partNumber,
+                        level = level,
                     ))
                 }
             }
@@ -51,8 +61,8 @@ class PartService(
             parts
         }
             .subscribeOn(Schedulers.boundedElastic())
-            .flatMapMany { todoList ->
-                partRepository.saveAll(todoList)
+            .flatMapMany { partList ->
+                partRepository.saveAll(partList)
             }
             .then()
     }
