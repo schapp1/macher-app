@@ -51,14 +51,22 @@ export const PartStore = signalStore(
           })
         )
       ),
-      uploadExcel: rxMethod<File>(
+      getAllPartsByMsn: rxMethod<{ msn: string }>(
         pipe(
-          switchMap(file => partService.uploadExcel(file).pipe(
-            catchError(error => {
-              console.error('Fehler beim Excel-Upload:', error);
-              return EMPTY;
-            }),
-          )),
+          switchMap(({ msn }) => partService.getAllPartsByMsn(msn)),
+          tap(parts => patchState(store, setAllEntities(parts)))
+        )
+      ),
+      uploadExcel: rxMethod<{ file: File; msnId: string }>(
+        pipe(
+          switchMap(({ file, msnId }) =>
+            partService.uploadExcel(file, msnId).pipe(
+              catchError(error => {
+                console.error('Fehler beim Excel-Upload:', error);
+                return EMPTY;
+              })
+            )
+          )
         )
       )
     }

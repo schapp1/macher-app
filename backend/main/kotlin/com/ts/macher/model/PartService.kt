@@ -1,4 +1,4 @@
-package com.ts.macher.models.todo
+package com.ts.macher.model
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Service
@@ -22,7 +22,7 @@ class PartService(
     fun deleteAll(): Mono<Void> = partRepository.deleteAll()
 
 
-    fun processExcelFile(file: MultipartFile): Mono<Void> {
+    fun processExcelFile(file: MultipartFile, msnId: String): Mono<Void> {
         return Mono.fromCallable {
             val workbook = XSSFWorkbook(file.inputStream)
             val sheet = workbook.getSheetAt(0)
@@ -62,7 +62,8 @@ class PartService(
 
                 // Erstelle nur ein RowPart, wenn die Bedingungen erfüllt sind
                 if ((level != 3 && (idlNumber.isNotBlank() || partNumber.isNotBlank())) ||
-                    (level == 3 && partNumber.isNotBlank())) {
+                    (level == 3 && partNumber.isNotBlank())
+                ) {
 
                     val rowPart = RowPart(
                         index = i,
@@ -83,13 +84,16 @@ class PartService(
                             currentSubAssembly = null
                             allParts.add(rowPart)
                         }
+
                         level == 5 && currentAssembly != null -> {
                             currentSubAssembly = rowPart
                             currentAssembly.children.add(rowPart)
                         }
+
                         level > 5 && currentSubAssembly != null -> {
                             currentSubAssembly.children.add(rowPart)
                         }
+
                         level == 3 -> {
                             // Nur Level-3-Parts mit nicht-leerer Partnummer werden gespeichert
                             allParts.add(rowPart)
@@ -100,10 +104,15 @@ class PartService(
 
             // Konvertiere die Hierarchie in Part-Objekte und setze isAssy
             fun convertToPart(rowPart: RowPart): Part {
-                val children = rowPart.children.map { convertToPart(it) }
+                val children = rowPart.children.map { childRowPart ->
+                    convertToPart(childRowPart).copy(
+                        msnIds = (rowPart.part.msnIds + msnId).distinct()
+                    )
+                }
                 return rowPart.part.copy(
                     children = children,
-                    isAssy = children.isNotEmpty()
+                    isAssy = children.isNotEmpty(),
+                    msnIds = (rowPart.part.msnIds + msnId).distinct()
                 )
             }
 
@@ -113,8 +122,43 @@ class PartService(
             rootParts
         }
             .subscribeOn(Schedulers.boundedElastic())
-            .flatMapMany { partList ->
-                partRepository.saveAll(partList)
+            .flatMapMany { newParts ->
+                // Zuerst alle existierenden Parts laden
+                partRepository.findAll()
+                    .collectList()
+                    .flatMapMany { existingParts ->
+                        val partsToUpdate = mutableListOf<Part>()
+                        val partsToCreate = mutableListOf<Part>()
+
+                        // Hilfsfunktion zum Aktualisieren der msnIds
+                        fun updatePartAndChildren(part: Part): Part {
+                            val updatedChildren = part.children.map { child ->
+                                updatePartAndChildren(child)
+                            }
+                            return part.copy(
+                                children = updatedChildren,
+                                msnIds = (part.msnIds + msnId).distinct()
+                            )
+                        }
+
+                        newParts.forEach { newPart ->
+                            // Suche nach existierendem Part mit gleicher Partnummer
+                            val existingPart = existingParts.find { it.partNumber == newPart.partNumber }
+                            if (existingPart != null) {
+                                // Part existiert bereits, nur msnId hinzufügen
+                                partsToUpdate.add(updatePartAndChildren(existingPart))
+                            } else {
+                                // Neuer Part, komplett hinzufügen
+                                partsToCreate.add(updatePartAndChildren(newPart))
+                            }
+                        }
+
+                        // Erst Updates ausführen, dann neue Parts erstellen
+                        Flux.concat(
+                            partRepository.saveAll(partsToUpdate),
+                            partRepository.saveAll(partsToCreate)
+                        )
+                    }
             }
             .then()
     }

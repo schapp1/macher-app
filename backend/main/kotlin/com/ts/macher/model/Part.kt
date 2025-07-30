@@ -1,4 +1,4 @@
-package com.ts.macher.models.todo
+package com.ts.macher.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -15,4 +15,5 @@ data class Part(
     val isAssy: Boolean = false,
     val children: List<Part> = emptyList(),
     val matShortText: String?,
+    val msnIds: List<String> = emptyList()
 )

@@ -2,7 +2,8 @@ import {Component, inject, OnInit} from '@angular/core';
 import {PartStore} from '../state/partStore';
 import {Part} from '../models/part';
 import {NgClass, NgIf, NgTemplateOutlet} from '@angular/common';
-import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MsnStore} from '../state/msnStore';
 
 @Component({
   selector: 'app-todo',
@@ -10,7 +11,8 @@ import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
     NgClass,
     ReactiveFormsModule,
     NgTemplateOutlet,
-    NgIf
+    NgIf,
+    FormsModule
 
   ],
   templateUrl: './part.component.html',
@@ -19,22 +21,30 @@ import {FormBuilder, ReactiveFormsModule} from '@angular/forms';
 export class PartComponent implements OnInit{
 
   private readonly partStore = inject(PartStore);
+  private readonly msnStore = inject(MsnStore);
   private readonly formBuilder = inject(FormBuilder);
   readonly parts$ = this.partStore.entities;
+  readonly msns$ = this.msnStore.entities;
   selectedPartId: string | null = null;
   selectedPart: Part | null = null;
   expandedPartIds = new Set<string>();
+  msnList: string[] = [];
+  selectedMsn: string = '';
 
 
-
-partForm = this.formBuilder.group({
+  partForm = this.formBuilder.group({
     part: '',
+  })
+
+  msnForm = this.formBuilder.group({
+    msn: '',
   })
 
   constructor() {}
 
   ngOnInit() {
     this.partStore.loadParts();
+    this.msnStore.loadMsn();
   }
 
   selectPart(part: Part): void {
@@ -64,6 +74,21 @@ partForm = this.formBuilder.group({
     }
   }
 
+  addMsn(): void {
+    const msn= this.msnForm.get('msn')?.value;
+    if (msn) {
+      this.msnStore.addMsn({msnId: msn});
+      this.partForm.reset();
+    }
+  }
+
+  deleteMsn() {
+    if (this.selectedMsn) {
+      this.msnStore.deleteMsn({ id: this.selectedMsn, msnId: this.selectedMsn });
+      this.selectedMsn = '';
+    }
+  }
+
   deletePart(): void {
     if (this.selectedPart) {
       this.partStore.deletePart(this.selectedPart);
@@ -72,13 +97,19 @@ partForm = this.formBuilder.group({
     }
   }
 
+  onMsnChange($event: any) {
+    if (this.selectedMsn) {
+      this.partStore.getAllPartsByMsn({ msn: this.selectedMsn });
+    }
+  }
+
   uploadExcel(event: Event): void {
     const target = event.target as HTMLInputElement;
     const files = target.files;
     if (files && files.length > 0) {
-      this.partStore.uploadExcel(files[0]);
-      // Datei-Input zurücksetzen
+      this.partStore.uploadExcel({ file: files[0], msnId: this.selectedMsn })
       target.value = '';
+      console.log(this.selectedMsn)
     }
     this.partStore.loadParts();
   }
@@ -86,4 +117,10 @@ partForm = this.formBuilder.group({
   deleteAllParts(): void {
     this.partStore.deleteAllParts()
   }
+
+/*  loadParts() {
+    if (this.selectedMsn) {
+      this.partStore.getAllPartsByMsn(this.selectedMsn)
+    }
+  }*/
 }

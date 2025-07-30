@@ -32,9 +32,14 @@ export class PartService {
     return this.http.delete<void>(this.API);
   }
 
-  uploadExcel(file: File): Observable<any> {
+  uploadExcel(file: File, msnId: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('msnId', msnId);
     return this.http.post<any>(`${this.API}/upload-excel`, formData);
+  }
+
+  getAllPartsByMsn(msn: string): Observable<Part[]> {
+    return this.http.get<Part[]>(`${this.API}/msn/${msn}`);
   }
 }
