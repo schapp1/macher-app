@@ -31,6 +31,7 @@
       <thead class="thead-dark">
       <tr>
         <th scope="col">IDL Nummer</th>
+        <th scope="col">Assy</th>
         <th scope="col">Teilenummer</th>
         <th scope="col">Materialkurztext</th>
         <th scope="col">MSN ID's</th>
@@ -57,6 +58,12 @@
              (click)="toggleExpand(part.id, $event)">
           </i>
           {{ part.idlNumber }}
+        </td>
+        <td>
+          <i *ngIf="part.isAssy; else cross" class="bi bi-check-lg text-success"></i>
+          <ng-template #cross>
+            <i class="bi bi-x-lg text-danger"></i>
+          </ng-template>
         </td>
         <td>{{ part.partNumber }}</td>
         <td>{{ part.matShortText }}</td>
