@@ -1,7 +1,7 @@
 package com.ts.macher.api
 
-import com.ts.macher.model.PartService
-import com.ts.macher.model.Part
+import com.ts.macher.model.part.PartService
+import com.ts.macher.model.part.Part
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.CrossOrigin

@@ -1,4 +1,4 @@
-package com.ts.macher.model
+package com.ts.macher.model.msn
 
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux

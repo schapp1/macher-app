@@ -1,4 +1,4 @@
-package com.ts.macher.model
+package com.ts.macher.model.part
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.springframework.stereotype.Service

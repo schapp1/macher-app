@@ -1,7 +1,7 @@
 package com.ts.macher.api
 
-import com.ts.macher.model.Msn
-import com.ts.macher.model.MsnService
+import com.ts.macher.model.msn.Msn
+import com.ts.macher.model.msn.MsnService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.DeleteMapping

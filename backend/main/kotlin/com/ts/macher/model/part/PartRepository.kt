@@ -1,8 +1,8 @@
-package com.ts.macher.model
+package com.ts.macher.model.part
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface MsnRepository : ReactiveMongoRepository<Msn, UUID>
+interface PartRepository : ReactiveMongoRepository<Part, UUID>
