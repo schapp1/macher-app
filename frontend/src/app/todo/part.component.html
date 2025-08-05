@@ -30,12 +30,9 @@
     <table class="table">
       <thead class="thead-dark">
       <tr>
-        <th scope="col">IDL Nummer</th>
-        <th scope="col">Assy</th>
         <th scope="col">Teilenummer</th>
         <th scope="col">Materialkurztext</th>
         <th scope="col">MSN ID's</th>
-        <th scope="col">Level</th>
       </tr>
       </thead>
       <tbody>
@@ -57,21 +54,10 @@
              [class.bi-caret-right-fill]="!isExpanded(part.id)"
              (click)="toggleExpand(part.id, $event)">
           </i>
-          {{ part.idlNumber }}
+          {{ part.partNumber }}
         </td>
-        <td>
-          <i *ngIf="part.isAssy; else cross" class="bi bi-check-lg text-success"></i>
-          <ng-template #cross>
-            <i class="bi bi-x-lg text-danger"></i>
-          </ng-template>
-        </td>
-        <td>{{ part.partNumber }}</td>
         <td>{{ part.matShortText }}</td>
         <td>{{ part.msnIds }}</td>
-        <td>{{ part.level }}</td>
-        <td>
-          <i *ngIf="part.isAssey" class="bi bi-box-seam text-primary"></i>
-        </td>
       </tr>
       @if (part.children?.length && isExpanded(part.id)) {
         @for (child of part.children; track child) {

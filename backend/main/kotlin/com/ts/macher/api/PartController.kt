@@ -1,5 +1,6 @@
 package com.ts.macher.api
 
+import com.ts.macher.model.Import
 import com.ts.macher.model.part.PartService
 import com.ts.macher.model.part.Part
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.io.File
 import java.util.UUID
 
 @RestController
@@ -33,6 +35,7 @@ import java.util.UUID
 class PartController(
     @Autowired
     private val partService: PartService,
+    private val importService: Import,
 ) {
 
     @GetMapping
@@ -47,29 +50,8 @@ class PartController(
     @DeleteMapping
     fun deleteAll(): Mono<Void> = partService.deleteAll()
 
-    @GetMapping("/msn/{id}")
-    fun getPartsByMsnId(@PathVariable id: String): Flux<Part> {
-        return partService.findAll()
-            .filter { part -> part.msnIds.contains(id) }
-            .collectList()
-            .flatMapMany { parts ->
-                if (parts.isEmpty()) {
-                    Mono.error(RuntimeException("Keine Teile für MSN-ID $id gefunden"))
-                } else {
-                    Flux.fromIterable(parts)
-                }
-            }
-    }
-
     @PostMapping("/upload-excel", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun uploadExcel(
-        @RequestParam("file") file: MultipartFile,
-        @RequestParam("msnId") msnId: String
-    ): Mono<String> {
-        return partService.processExcelFile(file, msnId)
-            .then(Mono.just("Excel-Datei erfolgreich verarbeitet"))
-            .onErrorResume { e ->
-                Mono.error(RuntimeException("Fehler beim Verarbeiten der Excel-Datei: ${e.message}"))
-            }
+    fun importExcel(@RequestParam("file") file: MultipartFile): Flux<Part> {
+        return importService.importExcelFile(file)
     }
 }
