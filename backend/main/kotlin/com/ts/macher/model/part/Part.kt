@@ -14,4 +14,5 @@ data class Part(
     val matShortText: String,
     val level: Int,
     val parent: String? = null,
+    var children: List<Part> = emptyList()
 )

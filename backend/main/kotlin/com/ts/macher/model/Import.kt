@@ -20,14 +20,13 @@ class Import(
         val sheet = workbook.getSheetAt(0)
 
         val headerRow = sheet.getRow(0)
-
         val partNumberIndex = findColumnIndex(headerRow, "partnummer")
         val levelIndex = findColumnIndex(headerRow, "auflösungsstufe")
         val matShortTextIndex = findColumnIndex(headerRow, "materialkurztext")
 
-
         val parentStack = Stack<ParentInfo>()
-        val parts = mutableListOf<Part>()
+        val partsMap = mutableMapOf<String, Part>() // Alle Parts nach PartNumber
+        val hierarchyMap = mutableMapOf<String, MutableList<Part>>()
 
         for (i in 1 until sheet.physicalNumberOfRows) {
             val row = sheet.getRow(i) ?: continue
@@ -38,30 +37,24 @@ class Import(
 
             val level = levelText.filter { it.isDigit() }.toIntOrNull() ?: 0
 
-            // Leere Zeilen mit Auflösungsstufe behandeln
             if (partNumber.isBlank() && levelText.isNotBlank()) {
-                // Stack zurücksetzen oder anpassen
                 while (parentStack.isNotEmpty() && parentStack.peek().level >= level) {
                     parentStack.pop()
                 }
                 continue
             }
 
-            // Nur Zeilen mit Partnummer und Auflösungsstufe >= 3 verarbeiten
             if (partNumber.isNotBlank() && level >= 3) {
                 var parent: String? = null
 
-                // Stack aktualisieren - Elemente mit höherer oder gleicher Stufe entfernen
                 while (parentStack.isNotEmpty() && parentStack.peek().level >= level) {
                     parentStack.pop()
                 }
 
-                // Parent setzen, wenn vorhanden
                 if (parentStack.isNotEmpty() && parentStack.peek().level == level - 1) {
                     parent = parentStack.peek().partNumber
                 }
 
-                // Part erstellen
                 val part = Part(
                     id = UUID.randomUUID(),
                     partNumber = partNumber,
@@ -70,15 +63,26 @@ class Import(
                     parent = parent
                 )
 
-                parts.add(part)
+                partsMap[partNumber] = part
 
-                // Aktuelles Teil als möglichen Parent hinzufügen
+                if (parent != null) {
+                    hierarchyMap.computeIfAbsent(parent) { mutableListOf() }.add(part)
+                }
+
                 parentStack.push(ParentInfo(level, partNumber))
             }
         }
 
+        // Verknüpfe Kind-Elemente mit den Eltern
+        partsMap.values.forEach { part ->
+            part.children = hierarchyMap[part.partNumber] ?: emptyList()
+        }
+
+        // Nur Root-Elemente (ohne Parent) zum Speichern auswählen
+        val rootParts = partsMap.values.filter { it.parent == null }
+
         workbook.close()
-        parts
+        rootParts
     }
         .subscribeOn(Schedulers.boundedElastic())
         .flatMapMany { partRepository.saveAll(it) }
